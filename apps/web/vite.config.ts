@@ -6,6 +6,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   server: {
     port: 3001,
+    proxy: {
+      "/ask": "http://localhost:8000",
+    },
   },
   resolve: {
     tsconfigPaths: true,

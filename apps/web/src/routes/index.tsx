@@ -1,34 +1,64 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { ChatInput } from "@/components/chat/chat-input";
+import { MessageList } from "@/components/chat/message-list";
+import { Sidebar } from "@/components/chat/sidebar";
+import { useConversations } from "@/hooks/use-conversations";
+import { sendMessage } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
-  component: HomeComponent,
+  component: ChatPage,
 });
 
-const TITLE_TEXT = `
- ██████╗ ███████╗████████╗████████╗███████╗██████╗
- ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
- ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝
- ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗
- ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║
- ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
+function ChatPage() {
+  const {
+    conversations,
+    activeId,
+    active,
+    selectConversation,
+    createConversation,
+    deleteConversation,
+    appendMessage,
+  } = useConversations();
+  const [isLoading, setIsLoading] = useState(false);
 
- ████████╗    ███████╗████████╗ █████╗  ██████╗██╗  ██╗
- ╚══██╔══╝    ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
-    ██║       ███████╗   ██║   ███████║██║     █████╔╝
-    ██║       ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
-    ██║       ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
-    ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
- `;
+  async function handleSend(text: string) {
+    const conversationId = active?.id ?? createConversation();
 
-function HomeComponent() {
+    appendMessage(conversationId, { role: "user", content: text });
+
+    setIsLoading(true);
+    try {
+      const reply = await sendMessage(text);
+      appendMessage(conversationId, { role: "assistant", content: reply });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send message");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-2">
-      <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-      <div className="grid gap-6">
-        <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
-        </section>
-      </div>
+    <div className="flex h-svh">
+      <Sidebar
+        conversations={conversations}
+        activeId={activeId}
+        onSelect={selectConversation}
+        onCreate={createConversation}
+        onDelete={deleteConversation}
+      />
+      <main className="flex flex-1 flex-col">
+        {active ? (
+          <MessageList messages={active.messages} isLoading={isLoading} />
+        ) : (
+          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+            Start a new conversation
+          </div>
+        )}
+        <ChatInput isLoading={isLoading} onSend={handleSend} />
+      </main>
     </div>
   );
 }
