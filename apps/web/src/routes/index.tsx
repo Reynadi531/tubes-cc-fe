@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ChatInput } from "@/components/chat/chat-input";
+import { EmptyState } from "@/components/chat/empty-state";
+import { Header } from "@/components/chat/header";
 import { MessageList } from "@/components/chat/message-list";
 import { Sidebar } from "@/components/chat/sidebar";
 import { useConversations } from "@/hooks/use-conversations";
-import { sendMessage } from "@/lib/api";
+import { AbortError, newMessage, sendMessage } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   component: ChatPage,
@@ -21,24 +23,59 @@ function ChatPage() {
     createConversation,
     deleteConversation,
     appendMessage,
+    renameConversation,
   } = useConversations();
   const [isLoading, setIsLoading] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
 
-  async function handleSend(text: string) {
-    const conversationId = active?.id ?? createConversation();
+  const sendIntoConversation = useCallback(
+    async (conversationId: string, text: string) => {
+      appendMessage(conversationId, newMessage("user", text));
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setIsLoading(true);
+      try {
+        const reply = await sendMessage(text, controller.signal);
+        appendMessage(conversationId, newMessage("assistant", reply));
+      } catch (err) {
+        if (err instanceof AbortError) {
+          toast("Stopped");
+          return;
+        }
+        toast.error(err instanceof Error ? err.message : "Failed to send message");
+      } finally {
+        if (abortRef.current === controller) abortRef.current = null;
+        setIsLoading(false);
+      }
+    },
+    [appendMessage],
+  );
 
-    appendMessage(conversationId, { role: "user", content: text });
+  const handleSend = useCallback(
+    (text: string) => {
+      const id = active?.id ?? createConversation();
+      void sendIntoConversation(id, text);
+    },
+    [active?.id, createConversation, sendIntoConversation],
+  );
 
-    setIsLoading(true);
-    try {
-      const reply = await sendMessage(text);
-      appendMessage(conversationId, { role: "assistant", content: reply });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send message");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const handleStop = useCallback(() => {
+    abortRef.current?.abort();
+  }, []);
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      const restore = deleteConversation(id);
+      toast("Conversation deleted", {
+        action: {
+          label: "Undo",
+          onClick: () => restore(),
+        },
+        duration: 5000,
+      });
+    },
+    [deleteConversation],
+  );
 
   return (
     <div className="flex h-svh">
@@ -46,18 +83,23 @@ function ChatPage() {
         conversations={conversations}
         activeId={activeId}
         onSelect={selectConversation}
-        onCreate={createConversation}
-        onDelete={deleteConversation}
+        onCreate={() => createConversation()}
+        onDelete={handleDelete}
       />
       <main className="flex flex-1 flex-col">
         {active ? (
-          <MessageList messages={active.messages} isLoading={isLoading} />
+          <>
+            <Header
+              title={active.title}
+              onRename={(next) => renameConversation(active.id, next)}
+              onDelete={() => handleDelete(active.id)}
+            />
+            <MessageList messages={active.messages} isLoading={isLoading} />
+          </>
         ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-            Start a new conversation
-          </div>
+          <EmptyState onSelect={handleSend} />
         )}
-        <ChatInput isLoading={isLoading} onSend={handleSend} />
+        <ChatInput isLoading={isLoading} onSend={handleSend} onStop={handleStop} />
       </main>
     </div>
   );
