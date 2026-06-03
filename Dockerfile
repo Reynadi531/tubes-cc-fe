@@ -20,10 +20,13 @@ COPY . .
 
 RUN bun run build
 
-FROM nginx:1.27-alpine AS runtime
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/apps/web/dist /usr/share/nginx/html
+FROM oven/bun:1.3.14-alpine AS runtime
+WORKDIR /app
+
+RUN bun install -g serve
+
+COPY --from=build /app/apps/web/dist ./dist
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["serve", "-s", "dist", "-l", "80"]
