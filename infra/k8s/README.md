@@ -2,19 +2,19 @@
 
 ## Quick Start
 
-## Pull the latest image
+### Pull the latest image
 
 ```bash
 docker pull ghcr.io/reynadi531/tubes-cc-fe:main
 ```
 
-## Dont forget to change direcotry to `tubes-fe/infra/k8s`
+### Dont forget to change direcotry to `tubes-fe/infra/k8s`
 
 ```bash
 cd ./infra/k8s
 ```
 
-## Apply the Kubernetes resources
+### Apply the Kubernetes resources
 
 ```bash
 # Apply all resources
@@ -25,6 +25,24 @@ kubectl apply -f namespace.yaml
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 kubectl apply -f ingress.yaml
+```
+
+### 5. Verify Deployment
+```bash
+# Check namespace
+kubectl get namespace yuki-fe
+
+# Check pods
+kubectl get pods -n yuki-fe
+
+# Check services
+kubectl get svc -n yuki-fe
+
+# Check ingress
+kubectl get ingress -n yuki-fe
+
+# View logs
+kubectl logs -f deployment/yuki-fe -n yuki-fe
 ```
 
 ## Access
