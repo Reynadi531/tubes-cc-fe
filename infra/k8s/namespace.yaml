@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tubes-fe
+  labels:
+    app.kubernetes.io/name: tubes-fe
+    app.kubernetes.io/managed-by: kubectl

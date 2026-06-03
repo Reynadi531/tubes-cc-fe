@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tubes-fe
+  namespace: tubes-fe
+  labels:
+    app.kubernetes.io/name: tubes-fe
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: tubes-fe.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tubes-fe
+                port:
+                  name: http
