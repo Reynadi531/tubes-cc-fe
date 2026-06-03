@@ -2,10 +2,13 @@
 
 ## Quick Start
 
-```bash
-# Build the Docker image
-docker build -t tubes-fe:latest .
+## Pull the latest image
 
+```bash
+docker pull ghcr.io/reynadi531/tubes-cc-fe:latest
+```
+
+```bash
 # Apply all resources
 kubectl apply -k .
 
@@ -21,7 +24,7 @@ kubectl apply -f ingress.yaml
 The Ingress is configured for `tubes-fe.local`. Add to `/etc/hosts`:
 
 ```
-127.0.0.1 tubes-fe.local
+127.0.0.1 yuki-fe.local
 ```
 
 Or
@@ -29,7 +32,7 @@ Or
 Use this command to port forward
 
 ```bash
-kubectl port-forward svc/tubes-fe 80:80 -n tubes-fe
+kubectl port-forward svc/yuki-fe 80:80 -n yuki-fe
 ```
 
 
