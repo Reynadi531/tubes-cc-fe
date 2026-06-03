@@ -24,6 +24,15 @@ The Ingress is configured for `tubes-fe.local`. Add to `/etc/hosts`:
 127.0.0.1 tubes-fe.local
 ```
 
+Or
+
+Use this command to port forward
+
+```bash
+kubectl port-forward svc/tubes-fe 80:80 -n tubes-fe
+```
+
+
 ## Production Checklist
 
 - [ ] Change `imagePullPolicy` to `Always` and use a real registry
