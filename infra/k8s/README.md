@@ -8,6 +8,12 @@
 docker pull ghcr.io/reynadi531/tubes-cc-fe:main
 ```
 
+## Dont forget to change direcotry to `tubes-fe/infra/k8s`
+
+```bash
+cd ./infra/k8s
+```
+
 ## Apply the Kubernetes resources
 
 ```bash
