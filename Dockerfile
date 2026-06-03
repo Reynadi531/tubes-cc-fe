@@ -29,4 +29,4 @@ COPY --from=build /app/apps/web/dist ./dist
 
 EXPOSE 80
 
-CMD ["serve", "-s", "dist", "-l", "80"]
+CMD ["bunx", "serve", "-s", "dist", "-l", "80"]
