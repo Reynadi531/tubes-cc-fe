@@ -5,8 +5,10 @@
 ## Pull the latest image
 
 ```bash
-docker pull ghcr.io/reynadi531/tubes-cc-fe:latest
+docker pull ghcr.io/reynadi531/tubes-cc-fe:main
 ```
+
+## Apply the Kubernetes resources
 
 ```bash
 # Apply all resources
