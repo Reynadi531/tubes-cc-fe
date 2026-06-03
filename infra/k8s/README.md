@@ -58,7 +58,7 @@ Or
 Use this command to port forward
 
 ```bash
-kubectl port-forward svc/yuki-fe 80:80 -n yuki-fe
+kubectl port-forward svc/yuki-fe 8080:80 -n yuki-fe
 ```
 
 

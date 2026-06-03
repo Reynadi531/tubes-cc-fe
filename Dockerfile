@@ -23,10 +23,11 @@ RUN bun run build
 FROM oven/bun:1.3.14-alpine AS runtime
 WORKDIR /app
 
-RUN bun install -g serve
+ENV PORT=8080
 
+COPY docker/static-server.mjs ./server.mjs
 COPY --from=build /app/apps/web/dist ./dist
 
-EXPOSE 80
+EXPOSE 8080
 
-CMD ["bunx", "serve", "-s", "dist", "-l", "80"]
+CMD ["bun", "./server.mjs"]
