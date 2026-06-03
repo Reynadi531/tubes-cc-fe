@@ -5,7 +5,7 @@
 ### Pull the latest image
 
 ```bash
-docker pull ghcr.io/reynadi531/tubes-cc-fe:main
+docker pull ghcr.io/reynadi531/tubes-cc-fe:latest
 ```
 
 ### Dont forget to change direcotry to `tubes-fe/infra/k8s`
