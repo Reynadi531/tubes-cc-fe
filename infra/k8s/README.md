@@ -1,72 +1,62 @@
 # Kubernetes Configuration
 
-## Quick Start
+## Default deployment flow
 
-### Pull the latest image
+This directory is designed for a port-forward-first workflow. You do not need an ingress controller or `/etc/hosts` changes for the default local verification path.
 
-```bash
-docker pull ghcr.io/reynadi531/tubes-cc-fe:latest
-```
-
-### Dont forget to change direcotry to `tubes-fe/infra/k8s`
+### 1. Build and push the image
 
 ```bash
-cd ./infra/k8s
+docker build -t ghcr.io/reynadi531/tubes-cc-fe:latest .
+docker push ghcr.io/reynadi531/tubes-cc-fe:latest
 ```
 
-### Apply the Kubernetes resources
+### 2. Apply the manifests
+
+From the repository root:
 
 ```bash
-# Apply all resources
-kubectl apply -k .
-
-# Or apply individually
-kubectl apply -f namespace.yaml
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-kubectl apply -f ingress.yaml
+kubectl apply -k infra/k8s
 ```
 
-### 5. Verify Deployment
-```bash
-# Check namespace
-kubectl get namespace yuki-fe
-
-# Check pods
-kubectl get pods -n yuki-fe
-
-# Check services
-kubectl get svc -n yuki-fe
-
-# Check ingress
-kubectl get ingress -n yuki-fe
-
-# View logs
-kubectl logs -f deployment/yuki-fe -n yuki-fe
-```
-
-## Access
-
-The Ingress is configured for `tubes-fe.local`. Add to `/etc/hosts`:
-
-```
-127.0.0.1 yuki-fe.local
-```
-
-Or
-
-Use this command to port forward
+### 3. Verify the deployment
 
 ```bash
-kubectl port-forward svc/yuki-fe 8080:80 -n yuki-fe
+kubectl get namespace tubes-fe
+kubectl get deployment,pods,svc -n tubes-fe
+kubectl logs -f deployment/tubes-fe -n tubes-fe
 ```
 
+### 4. Access the app
 
-## Production Checklist
+```bash
+kubectl port-forward svc/tubes-fe 8080:80 -n tubes-fe
+```
 
-- [ ] Change `imagePullPolicy` to `Always` and use a real registry
-- [ ] Add TLS to Ingress via cert-manager
+Then open `http://127.0.0.1:8080`.
+
+## Optional ingress access
+
+An ingress manifest is included and routes `tubes-fe.local` to the `tubes-fe` service on the `http` port. This is optional and only useful if your cluster already has a compatible ingress controller, such as nginx.
+
+If you choose to use ingress, point `tubes-fe.local` at your ingress entrypoint and verify the ingress resource:
+
+```bash
+kubectl get ingress -n tubes-fe
+```
+
+## Runtime contract
+
+- Image: `ghcr.io/reynadi531/tubes-cc-fe:latest`
+- Container port: `8080`
+- Service port: `80`
+- Namespace: `tubes-fe`
+
+## Production checklist
+
+- [ ] Change `imagePullPolicy` to `Always` and use an immutable image tag
+- [ ] Add TLS to ingress via cert-manager or your cluster ingress solution
 - [ ] Configure resource limits based on actual usage
-- [ ] Add HorizontalPodAutoscaler for scaling
+- [ ] Add HorizontalPodAutoscaler if needed
 - [ ] Set up NetworkPolicy for isolation
 - [ ] Configure PodDisruptionBudget for availability

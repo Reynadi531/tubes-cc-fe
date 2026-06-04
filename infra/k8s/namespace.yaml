@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: yuki-fe
+  name: tubes-fe
   labels:
-    app.kubernetes.io/name: yuki-fe
+    app.kubernetes.io/name: tubes-fe
     app.kubernetes.io/managed-by: kubectl

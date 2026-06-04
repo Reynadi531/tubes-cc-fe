@@ -1,21 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: yuki-fe
-  namespace: yuki-fe
+  name: tubes-fe
+  namespace: tubes-fe
   labels:
-    app.kubernetes.io/name: yuki-fe
+    app.kubernetes.io/name: tubes-fe
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-    - host: yuki-fe.local
+    - host: tubes-fe.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: yuki-fe
+                name: tubes-fe
                 port:
                   name: http
