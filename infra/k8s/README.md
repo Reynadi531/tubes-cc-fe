@@ -11,11 +11,16 @@ docker build -t ghcr.io/reynadi531/tubes-cc-fe:latest .
 docker push ghcr.io/reynadi531/tubes-cc-fe:latest
 ```
 
-### 2. Apply the manifests
+### 2. Create the runtime config secret and apply the manifests
 
 From the repository root:
 
 ```bash
+kubectl create secret generic yuki-fe-env \
+  --namespace tubes-fe \
+  --from-literal=VITE_SERVER_URL=http://your-api-host:8000 \
+  --dry-run=client -o yaml | kubectl apply -f -
+
 kubectl apply -k infra/k8s
 ```
 
@@ -51,6 +56,8 @@ kubectl get ingress -n tubes-fe
 - Container port: `8080`
 - Service port: `80`
 - Namespace: `tubes-fe`
+
+- Runtime API URL secret: `tubes-fe-web-env` / `VITE_SERVER_URL`
 
 ## Production checklist
 

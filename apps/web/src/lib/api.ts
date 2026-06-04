@@ -1,4 +1,7 @@
-import { env } from "@tubes-fe/env/web";
+import { getRuntimeAppConfig } from "@/lib/runtime-config";
+
+const runtimeAppConfig = getRuntimeAppConfig();
+const baseUrl = runtimeAppConfig?.VITE_SERVER_URL ?? import.meta.env.VITE_SERVER_URL ?? "";
 
 export type MessageRole = "user" | "assistant";
 
@@ -16,8 +19,11 @@ export type Conversation = {
   createdAt: number;
 };
 
-const BASE_URL = env.VITE_SERVER_URL ?? "";
 
+
+function buildAskUrl() {
+  return `${baseUrl}/ask`;
+}
 export class AbortError extends Error {
   constructor() {
     super("Request aborted");
@@ -28,7 +34,7 @@ export class AbortError extends Error {
 export async function sendMessage(query: string, signal?: AbortSignal): Promise<string> {
   let res: Response;
   try {
-    res = await fetch(`${BASE_URL}/ask`, {
+    res = await fetch(buildAskUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query }),
