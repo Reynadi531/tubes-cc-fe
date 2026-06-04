@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: tubes-fe
-    namespace: tubes-fe
+    name: yuki-fe
+    namespace: yuki-fe
     labels:
-        app.kubernetes.io/name: tubes-fe
+        app.kubernetes.io/name: yuki-fe
         app.kubernetes.io/component: frontend
 spec:
     replicas: 2
     selector:
         matchLabels:
-            app.kubernetes.io/name: tubes-fe
+            app.kubernetes.io/name: yuki-fe
     template:
         metadata:
             labels:
-                app.kubernetes.io/name: tubes-fe
+                app.kubernetes.io/name: yuki-fe
                 app.kubernetes.io/component: frontend
         spec:
             containers:
-                - name: tubes-fe
-                  image: ghcr.io/reynadi531/tubes-cc-fe:latest
+                - name: yuki-fe
+                  image: ghcr.io/reynadi531/yuki-fe:latest
                   imagePullPolicy: Always
                   env:
                       - name: VITE_SERVER_URL

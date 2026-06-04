@@ -7,8 +7,8 @@ This directory is designed for a port-forward-first workflow. You do not need an
 ### 1. Build and push the image
 
 ```bash
-docker build -t ghcr.io/reynadi531/tubes-cc-fe:latest .
-docker push ghcr.io/reynadi531/tubes-cc-fe:latest
+docker build -t ghcr.io/reynadi531/yuki-fe:latest .
+docker push ghcr.io/reynadi531/yuki-fe:latest
 ```
 
 ### 2. Create the runtime config secret and apply the manifests
@@ -17,7 +17,7 @@ From the repository root:
 
 ```bash
 kubectl create secret generic yuki-fe-env \
-  --namespace tubes-fe \
+  --namespace yuki-fe \
   --from-literal=VITE_SERVER_URL=http://your-api-host:8000 \
   --dry-run=client -o yaml | kubectl apply -f -
 
@@ -27,37 +27,37 @@ kubectl apply -k infra/k8s
 ### 3. Verify the deployment
 
 ```bash
-kubectl get namespace tubes-fe
-kubectl get deployment,pods,svc -n tubes-fe
-kubectl logs -f deployment/tubes-fe -n tubes-fe
+kubectl get namespace yuki-fe
+kubectl get deployment,pods,svc -n yuki-fe
+kubectl logs -f deployment/yuki-fe -n yuki-fe
 ```
 
 ### 4. Access the app
 
 ```bash
-kubectl port-forward svc/tubes-fe 8080:80 -n tubes-fe
+kubectl port-forward svc/yuki-fe 8080:80 -n yuki-fe
 ```
 
 Then open `http://127.0.0.1:8080`.
 
 ## Optional ingress access
 
-An ingress manifest is included and routes `tubes-fe.local` to the `tubes-fe` service on the `http` port. This is optional and only useful if your cluster already has a compatible ingress controller, such as nginx.
+An ingress manifest is included and routes `yuki-fe.local` to the `yuki-fe` service on the `http` port. This is optional and only useful if your cluster already has a compatible ingress controller, such as nginx.
 
-If you choose to use ingress, point `tubes-fe.local` at your ingress entrypoint and verify the ingress resource:
+If you choose to use ingress, point `yuki-fe.local` at your ingress entrypoint and verify the ingress resource:
 
 ```bash
-kubectl get ingress -n tubes-fe
+kubectl get ingress -n yuki-fe
 ```
 
 ## Runtime contract
 
-- Image: `ghcr.io/reynadi531/tubes-cc-fe:latest`
+- Image: `ghcr.io/reynadi531/yuki-fe:latest`
 - Container port: `8080`
 - Service port: `80`
-- Namespace: `tubes-fe`
+- Namespace: `yuki-fe`
 
-- Runtime API URL secret: `tubes-fe-web-env` / `VITE_SERVER_URL`
+- Runtime API URL secret: `yuki-fe-env` / `VITE_SERVER_URL`
 
 ## Production checklist
 
