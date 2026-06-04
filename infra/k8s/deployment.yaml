@@ -19,7 +19,7 @@ spec:
         spec:
             containers:
                 - name: yuki-fe
-                  image: ghcr.io/reynadi531/yuki-fe:sha-450b16e
+                  image: ghcr.io/reynadi531/tubes-cc-fe:latest
                   imagePullPolicy: Always
                   env:
                       - name: VITE_SERVER_URL
